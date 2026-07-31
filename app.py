@@ -71,8 +71,12 @@ def generate(
         seed = random.randint(0, MAX_SEED)
     seed = int(seed)
 
-    # Apply / adjust LoRA strength — adapter name is "default_0" after load_lora_weights
-    adapter_names = list(pipe.get_list_adapters() or ["default_0"])
+    # Apply / adjust LoRA strength — load_lora_weights names the adapter "default_0"
+    adapters = pipe.get_list_adapters()
+    if adapters:
+        adapter_names = list(adapters.values())
+    else:
+        adapter_names = ["default_0"]
     pipe.set_adapters(adapter_names, adapter_weights=[float(lora_strength)] * len(adapter_names))
 
     generator = torch.Generator(device=device).manual_seed(seed)
