@@ -71,8 +71,9 @@ def generate(
         seed = random.randint(0, MAX_SEED)
     seed = int(seed)
 
-    # Apply / adjust LoRA strength
-    pipe.set_adapters(["default"], adapter_weights=[float(lora_strength)])
+    # Apply / adjust LoRA strength — adapter name is "default_0" after load_lora_weights
+    adapter_names = list(pipe.get_list_adapters() or ["default_0"])
+    pipe.set_adapters(adapter_names, adapter_weights=[float(lora_strength)] * len(adapter_names))
 
     generator = torch.Generator(device=device).manual_seed(seed)
 
@@ -97,7 +98,7 @@ CSS = """
 .dark .gradio-container { color: var(--body-text-color); }
 """
 
-with gr.Blocks(theme=gr.themes.Citrus(), css=CSS) as demo:
+with gr.Blocks(css=CSS) as demo:
     with gr.Column(elem_id="col-container"):
         gr.Markdown(
             """# CharacterSheet LoRA — QuadView on FLUX.2 Klein 9B
@@ -174,4 +175,4 @@ Turn a single character photo into a multi-view reference sheet (face close-up +
         api_name="generate",
     )
 
-demo.launch(mcp_server=True)
+demo.launch(mcp_server=True, theme=gr.themes.Citrus())
