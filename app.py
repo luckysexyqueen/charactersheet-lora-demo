@@ -74,7 +74,12 @@ def generate(
     # Apply / adjust LoRA strength — load_lora_weights names the adapter "default_0"
     adapters = pipe.get_list_adapters()
     if adapters:
-        adapter_names = list(adapters.values())
+        adapter_names = []
+        for v in adapters.values():
+            if isinstance(v, list):
+                adapter_names.extend(v)
+            else:
+                adapter_names.append(v)
     else:
         adapter_names = ["default_0"]
     pipe.set_adapters(adapter_names, adapter_weights=[float(lora_strength)] * len(adapter_names))
